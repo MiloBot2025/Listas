@@ -1,0 +1,8 @@
+stock:
+  per_provider_pattern: "outputs/stock/{PROV}/STOCK_{PROV}_%Y%m%d_%H%M.xlsx"
+  latest_public_path:   "docs/stock/{PROV}_latest.xlsx"
+  write_json_per_provider: true
+  json_public_dir: "docs/data/stock"
+
+meta:
+  path: "docs/data/meta.json"
