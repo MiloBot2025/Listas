@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Estado de Listas</title>
+  <link rel="icon" href="assets/logo.png" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <img src="assets/logo.png" alt="Logo" class="logo" />
+    <a id="runBtn" class="btn" target="_blank">Actualizar ahora</a>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <h2>Base de datos actualizada</h2>
+      <p id="dbDate">—</p><p id="dbCount">—</p>
+    </section>
+    <section class="card">
+      <h2>Stock actualizado</h2>
+      <p id="stockDate">—</p><p id="stockCount">—</p>
+    </section>
+    <section class="card">
+      <h2>Cambios de precios</h2>
+      <p id="chgDate">—</p><p id="chgCount">—</p>
+    </section>
+  </main>
+
+  <script>
+  // ⚠️ Cambiá estos 2 valores por tu repo real:
+  const REPO_OWNER = "MiloBot2025";
+  const REPO_NAME  = "Listas";
+  const WORKFLOW_FILE = "venetian-data.yml"; // lo creamos en un paso siguiente
+
+  // Cargar meta.json (si existe)
+  async function loadMeta(){
+    try{
+      const r = await fetch("data/meta.json?cb="+Date.now());
+      if(!r.ok) return;
+      const m = await r.json();
+      document.getElementById("dbDate").textContent    = m.last_update_db    || "—";
+      document.getElementById("stockDate").textContent = m.last_update_stock || "—";
+      document.getElementById("chgDate").textContent   = m.last_update_cambios || "—";
+      const c = m.counts || {};
+      document.getElementById("dbCount").textContent   = `Productos: ${c.productos ?? "—"}`;
+      document.getElementById("stockCount").textContent= `Con stock: ${c.con_stock ?? 0} · Bajo: ${c.bajo ?? 0}`;
+      document.getElementById("chgCount").textContent  = `Últimas 24h: ${c.cambios_24h ?? 0}`;
+    }catch(e){}
+  }
+
+  // Botón: abre la página del workflow para ejecutar con "Run workflow"
+  document.getElementById("runBtn").href =
+    `https://github.com/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}`;
+
+  loadMeta();
+  </script>
+</body>
+</html>
