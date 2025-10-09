@@ -1,0 +1,43 @@
+tevelam:
+  stock:
+    start_row: 11
+    id_col: "A"
+    stock_col: "I"
+    mirror_FT: true
+    source:
+      method: "http"
+      url: "https://drive.google.com/uc?export=download&id=1hPH3VwQDtMgx_AkC5hFCUbM2MEiwBEpT"
+
+disco:
+  stock:
+    start_row: 9
+    header_row: 8
+    id_col: "A"
+    stock_col: "G"
+    mirror_FT: true
+    source:
+      method: "http"
+      url: "https://drive.google.com/uc?id=1-aQ842Dq3T1doA-Enb34iNNzenLGkVkr&export=download"
+
+imsa:
+  stock:
+    mode: "auto_headers"
+    fallback: { start_row: 8, id_col: "A", stock_col: "H" }
+    solo_con_stock: true
+    source:
+      method: "http"              # usa "selenium" solo si es necesario
+      url: "https://drive.google.com/uc?export=download&id=ID_IMSA"
+      # password_env: "IMSA_PASSWORD"
+      # password_selector: "input[type='password']"
+      # submit_selector: "button[type='submit']"
+      # download_selector: "#btn-descargar"
+
+ars:
+  stock:
+    sheet: "STOCK"
+    start_row: 2
+    id_col: "B"
+    stock_col: "D"
+    source:
+      method: "http"
+      url: "https://docs.google.com/uc?id=1JnUnrpZUniTXUafkAxCInPG7O39yrld5&export=download"
