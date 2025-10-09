@@ -1,0 +1,65 @@
+name: Venetian Data (STOCK)
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"          # cada 30 min (UTC)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Forzar ejecución (ignora ventana y freshness)"
+        required: false
+        default: "false"
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: venetian-data
+  cancel-in-progress: false
+
+jobs:
+  stock:
+    runs-on: ubuntu-latest
+    env:
+      INPUT_FORCE: ${{ inputs.force }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Window gate (L–V 07–18 AR)
+        id: win
+        run: |
+          python scripts/gates/gate_window.py >> $GITHUB_OUTPUT
+
+      - name: Freshness gate (stock)
+        id: fresh
+        env:
+          KIND: stock
+        run: |
+          python scripts/gates/gate_freshness.py >> $GITHUB_OUTPUT
+
+      - name: Run pipeline (stock)
+        if: ${{ steps.win.outputs.RUN == '1' && steps.fresh.outputs.FRESH == '1' }}
+        env:
+          IMSA_PASSWORD: ${{ secrets.IMSA_PASSWORD }}
+        run: python scripts/pipelines/pipeline_stock.py
+
+      - name: Commit /docs (stock)
+        if: ${{ always() && (steps.win.outputs.RUN == '1' && steps.fresh.outputs.FRESH == '1') }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add docs/stock docs/data state/hashdb || true
+          git commit -m "stock: update $(date -u +'%Y-%m-%d %H:%M UTC')" || echo "nothing to commit"
+          git push
